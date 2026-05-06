@@ -1,15 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GuestBook.Data;
 using GuestBook.Models;
+using GuestBook.Services;
 
 namespace GuestBook.Controllers;
 
 public class AccountController : Controller
 {
-    private readonly AppDbContext _db;
+    private readonly IUserService _users;
 
-    public AccountController(AppDbContext db) => _db = db;
+    public AccountController(IUserService users) => _users = users;
 
     // ── GET /Account/Login ────────────────────────────────────────────────
     public IActionResult Login() => View(new LoginViewModel());
@@ -21,16 +20,15 @@ public class AccountController : Controller
     {
         if (!ModelState.IsValid) return View(vm);
 
-        var user = await _db.Users
-            .FirstOrDefaultAsync(u => u.Login == vm.Login);
+        var user = await _users.GetByLoginAsync(vm.Login);
 
-        if (user is null || !BCrypt.Net.BCrypt.Verify(vm.Password, user.PasswordHash))
+        if (user is null || !_users.VerifyPassword(user, vm.Password))
         {
             ModelState.AddModelError(string.Empty, "Невірний логін або пароль.");
             return View(vm);
         }
 
-        HttpContext.Session.SetInt32("UserId", user.Id);
+        HttpContext.Session.SetInt32("UserId",    user.Id);
         HttpContext.Session.SetString("UserLogin", user.Login);
 
         return RedirectToAction("Index", "Home");
@@ -46,20 +44,13 @@ public class AccountController : Controller
     {
         if (!ModelState.IsValid) return View(vm);
 
-        // Check login uniqueness
-        bool exists = await _db.Users.AnyAsync(u => u.Login == vm.Login);
-        if (exists)
+        if (await _users.LoginExistsAsync(vm.Login))
         {
             ModelState.AddModelError("Login", "Цей логін вже зайнятий.");
             return View(vm);
         }
 
-        _db.Users.Add(new User
-        {
-            Login        = vm.Login,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(vm.Password)
-        });
-        await _db.SaveChangesAsync();
+        await _users.CreateAsync(vm.Login, vm.Password);
 
         TempData["Success"] = "Реєстрація успішна! Тепер увійдіть у систему.";
         return RedirectToAction(nameof(Login));

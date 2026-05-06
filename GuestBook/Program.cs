@@ -1,17 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using GuestBook.Data;
+using GuestBook.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        sql => sql.EnableRetryOnFailure()
-    ));
+// Реєстрація БД та сервісного шару через extension-метод
+builder.Services.AddGuestBookServices(builder.Configuration);
 
-// Session (for login state)
+// Сесія (стан авторизації)
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout        = TimeSpan.FromHours(2);
@@ -21,7 +19,7 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
-// Auto-apply migrations on startup
+// Автоматичне застосування міграцій при старті
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -37,7 +35,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseSession();          // ← must be before MapControllerRoute
+app.UseSession();
 app.UseAuthorization();
 
 app.MapControllerRoute(

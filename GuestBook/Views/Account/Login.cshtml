@@ -1,0 +1,71 @@
+@model GuestBook.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Вхід у систему";
+}
+
+<div class="auth-page">
+  <div class="auth-card">
+
+    <div class="auth-header">
+      <div class="auth-icon">✦</div>
+      <h1 class="auth-title">Вхід</h1>
+      <p class="auth-sub">Введіть логін та пароль</p>
+    </div>
+
+    @if (TempData["Success"] is string msg)
+    {
+      <div class="toast-success"><span class="toast-icon">✓</span> @msg</div>
+    }
+
+    <div asp-validation-summary="ModelOnly" class="val-summary"></div>
+
+    <form asp-action="Login" method="post" novalidate>
+      @Html.AntiForgeryToken()
+
+      <div class="auth-form-body">
+
+        <div class="form-group">
+          <label asp-for="Login" class="form-label">
+            <span class="form-label-required">*</span> Логін
+          </label>
+          <div class="form-input-wrap">
+            <input asp-for="Login" class="form-input" placeholder="Ваш логін" autocomplete="username" />
+            <span class="form-input-icon">◈</span>
+          </div>
+          <span asp-validation-for="Login" class="field-error">
+            <span class="field-error-icon">⚠</span>
+            <span class="field-error-text"></span>
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label asp-for="Password" class="form-label">
+            <span class="form-label-required">*</span> Пароль
+          </label>
+          <div class="form-input-wrap">
+            <input asp-for="Password" class="form-input" type="password" placeholder="••••••" autocomplete="current-password" />
+            <span class="form-input-icon">🔑</span>
+          </div>
+          <span asp-validation-for="Password" class="field-error">
+            <span class="field-error-icon">⚠</span>
+            <span class="field-error-text"></span>
+          </span>
+        </div>
+
+        <button type="submit" class="btn-primary btn-full">Увійти →</button>
+
+      </div>
+    </form>
+
+    <div class="auth-footer">
+      <a asp-controller="Account" asp-action="Register" class="auth-link">Реєстрація</a>
+      <span class="auth-sep">·</span>
+      <a asp-controller="Home" asp-action="Index" class="auth-link">Увійти як гість</a>
+    </div>
+
+  </div>
+</div>
+
+@section Scripts {
+  <partial name="_ValidationScriptsPartial" />
+}

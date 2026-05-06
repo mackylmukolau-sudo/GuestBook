@@ -1,0 +1,101 @@
+@model GuestBook.Models.PostMessageViewModel
+@{
+    ViewData["Title"] = "Гостьова книга";
+    var messages = ViewBag.Messages as IEnumerable<GuestBook.Models.Message> ?? Enumerable.Empty<GuestBook.Models.Message>();
+    var userLogin = Context.Session.GetString("UserLogin");
+    bool isLoggedIn = userLogin != null;
+}
+
+<div class="gb-page">
+
+  <!-- ── Hero ─────────────────────────────────────────────────── -->
+  <section class="gb-hero">
+    <div class="gb-hero-inner">
+      <div class="gb-eyebrow">Залишіть свій слід</div>
+      <h1 class="gb-title">Гостьова <em>книга</em></h1>
+      <p class="gb-sub">@messages.Count() повідомлень від наших гостей</p>
+    </div>
+  </section>
+
+  <div class="gb-layout">
+
+    <!-- ── Left: message form ──────────────────────────────────── -->
+    <aside class="gb-sidebar">
+      @if (isLoggedIn)
+      {
+        <div class="gb-form-card">
+          <div class="gb-form-card-header">
+            <span class="gb-form-card-title">✦ Написати</span>
+            <span class="gb-form-card-user">@userLogin</span>
+          </div>
+
+          <div asp-validation-summary="ModelOnly" class="val-summary"></div>
+
+          <form asp-action="Index" method="post">
+            @Html.AntiForgeryToken()
+            <div class="gb-form-body">
+              <div class="form-group">
+                <label asp-for="Text" class="form-label">Ваше повідомлення</label>
+                <textarea asp-for="Text"
+                          class="form-input form-textarea"
+                          rows="5"
+                          placeholder="Напишіть щось..."></textarea>
+                <span asp-validation-for="Text" class="field-error">
+                  <span class="field-error-icon">⚠</span>
+                  <span class="field-error-text"></span>
+                </span>
+              </div>
+              <button type="submit" class="btn-primary btn-full">
+                ✦ Додати повідомлення
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+      else
+      {
+        <div class="gb-guest-card">
+          <div class="gb-guest-icon">✦</div>
+          <p class="gb-guest-text">Щоб залишити повідомлення, увійдіть у систему або зареєструйтесь.</p>
+          <div class="gb-guest-actions">
+            <a asp-controller="Account" asp-action="Login"    class="btn-primary">Увійти</a>
+            <a asp-controller="Account" asp-action="Register" class="btn-outline">Реєстрація</a>
+          </div>
+        </div>
+      }
+    </aside>
+
+    <!-- ── Right: messages list ────────────────────────────────── -->
+    <section class="gb-messages">
+      @if (!messages.Any())
+      {
+        <div class="gb-empty">
+          <div class="gb-empty-icon">◌</div>
+          <p>Поки що немає повідомлень. Будьте першим!</p>
+        </div>
+      }
+      else
+      {
+        @foreach (var msg in messages)
+        {
+          <article class="gb-msg">
+            <div class="gb-msg-header">
+              <div class="gb-msg-avatar">@msg.User.Login[0].ToString().ToUpper()</div>
+              <div class="gb-msg-meta">
+                <span class="gb-msg-login">@msg.User.Login</span>
+                <span class="gb-msg-time">@msg.DateTime.ToString("dd.MM.yyyy, HH:mm")</span>
+              </div>
+            </div>
+            <div class="gb-msg-text">@msg.Text</div>
+          </article>
+        }
+      }
+    </section>
+
+  </div>
+</div>
+
+@section Scripts {
+  <partial name="_ValidationScriptsPartial" />
+  <script src="~/js/site.js" asp-append-version="true"></script>
+}

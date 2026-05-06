@@ -1,0 +1,83 @@
+@model GuestBook.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Реєстрація";
+}
+
+<div class="auth-page">
+  <div class="auth-card">
+
+    <div class="auth-header">
+      <div class="auth-icon">◈</div>
+      <h1 class="auth-title">Реєстрація</h1>
+      <p class="auth-sub">Створіть обліковий запис</p>
+    </div>
+
+    <div asp-validation-summary="ModelOnly" class="val-summary"></div>
+
+    <form asp-action="Register" method="post" novalidate>
+      @Html.AntiForgeryToken()
+
+      <div class="auth-form-body">
+
+        <div class="form-group">
+          <label asp-for="Login" class="form-label">
+            <span class="form-label-required">*</span> Логін
+          </label>
+          <div class="form-input-wrap">
+            <input asp-for="Login" class="form-input" placeholder="Мінімум 3 символи, без пробілів" autocomplete="username" />
+            <span class="form-input-icon">◈</span>
+          </div>
+          <span asp-validation-for="Login" class="field-error">
+            <span class="field-error-icon">⚠</span>
+            <span class="field-error-text"></span>
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label asp-for="Password" class="form-label">
+            <span class="form-label-required">*</span> Пароль
+          </label>
+          <div class="form-input-wrap">
+            <input asp-for="Password" class="form-input" type="password" placeholder="Мінімум 6 символів" autocomplete="new-password" />
+            <span class="form-input-icon">🔑</span>
+          </div>
+          <span asp-validation-for="Password" class="field-error">
+            <span class="field-error-icon">⚠</span>
+            <span class="field-error-text"></span>
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label asp-for="ConfirmPassword" class="form-label">
+            <span class="form-label-required">*</span> Підтвердіть пароль
+          </label>
+          <div class="form-input-wrap">
+            <input asp-for="ConfirmPassword" class="form-input" type="password" placeholder="Повторіть пароль" autocomplete="new-password" />
+            <span class="form-input-icon">🔒</span>
+          </div>
+          <span asp-validation-for="ConfirmPassword" class="field-error">
+            <span class="field-error-icon">⚠</span>
+            <span class="field-error-text"></span>
+          </span>
+        </div>
+
+        <p class="auth-hint">
+          <span class="form-label-required">*</span> — обов'язкові поля
+        </p>
+
+        <button type="submit" class="btn-primary btn-full">Зареєструватись →</button>
+
+      </div>
+    </form>
+
+    <div class="auth-footer">
+      <span class="auth-sep-text">Вже є обліковий запис?</span>
+      <a asp-controller="Account" asp-action="Login" class="auth-link">Увійти</a>
+    </div>
+
+  </div>
+</div>
+
+@section Scripts {
+  <partial name="_ValidationScriptsPartial" />
+}

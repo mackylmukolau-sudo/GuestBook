@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@ViewData["Title"] — Гостьова книга</title>
+  <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Syne:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="grain"></div>
+
+<header class="site-header">
+  <a class="brand" href="/">
+    <span class="brand-icon">✦</span>
+    <span class="brand-text">Гостьова<em>Книга</em></span>
+  </a>
+  <nav class="site-nav">
+    @if (Context.Session.GetString("UserLogin") is string login)
+    {
+      <span class="nav-user">👤 @login</span>
+      <span class="nav-dot">·</span>
+      <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="nav-btn-logout">Вийти</button>
+      </form>
+    }
+    else
+    {
+      <a asp-controller="Account" asp-action="Login"    class="nav-link">Вхід</a>
+      <span class="nav-dot">·</span>
+      <a asp-controller="Account" asp-action="Register" class="nav-link nav-link--accent">Реєстрація</a>
+    }
+  </nav>
+</header>
+
+<main class="site-main">
+  @RenderBody()
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span class="footer-brand">✦ Гостьова книга</span>
+    <span class="footer-tech">ASP.NET Core 8 MVC · EF Core · SQL Server</span>
+    <span class="footer-copy">&copy; @DateTime.Now.Year</span>
+  </div>
+</footer>
+
+<script src="~/js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
